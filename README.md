@@ -20,10 +20,3 @@ No dependencies are required for this role.
 - hosts: servers
   roles:
     - docker-installation-ubuntu
-
-
-## License
-MIT
-
-## Author Information
-Created by Surya
