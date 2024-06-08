@@ -1,0 +1,64 @@
+---
+- name: Update the apt package index
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: Install prerequisite packages
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - software-properties-common
+    state: latest
+  
+
+- name: Add the GPG key for the official Docker repository
+  ansible.builtin.shell:
+    cmd: "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor --yes -o /usr/share/keyrings/docker-archive-keyring.gpg"
+    creates: /usr/share/keyrings/docker-archive-keyring.gpg
+
+- name: Add the Docker repository to APT sources
+  ansible.builtin.shell:
+    cmd: 'echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null'
+  notify: Update apt package index
+
+- name: Get Docker CE package policy
+  ansible.builtin.shell:
+    cmd: "apt-cache policy docker-ce"
+  register: docker_ce_policy
+
+- name: Display Docker CE policy status
+  ansible.builtin.debug:
+    var: docker_ce_policy.stdout_lines
+
+- name: Install Docker
+  ansible.builtin.apt:
+    name: docker-ce
+    state: present
+
+- name: Check Docker status
+  ansible.builtin.shell:
+    cmd: "systemctl status docker"
+  register: docker_status
+
+- name: Display the Docker status
+  ansible.builtin.debug:
+    var: docker_status.stdout_lines
+
+- name: Add current user to the docker group
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: yes
+    state: present
+  register: docker_user_added
+
+- name: Verify user is in the docker group
+  ansible.builtin.shell:
+    cmd: "id -nG {{ ansible_user }}"
+  register: current_user_groups_list
+
+- name: Display group membership
+  ansible.builtin.debug:
+    var: current_user_groups_list.stdout

@@ -1,0 +1,23 @@
+galaxy_info:
+  author: Surya
+  description: |
+    This Ansible role automates the installation and configuration of Docker on Ubuntu systems. It performs the following tasks:
+    1. Updates the apt package index to ensure the latest package information is available.
+    2. Installs prerequisite packages required for Docker installation.
+    3. Adds the GPG key for the official Docker repository to ensure package integrity.
+    4. Adds the Docker repository to APT sources for package installation.
+    5. Retrieves Docker CE package policy information for verification.
+    6. Installs Docker CE using the apt package manager.
+    7. Checks the status of the Docker service.
+    8. Adds the current user to the Docker group for managing Docker as a non-root user.
+    9. Verifies that the user is successfully added to the Docker group.
+
+license: "MIT"
+  min_ansible_version: "2.10"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - all
+  galaxy_tags:
+    - docker
+    - ubuntu
